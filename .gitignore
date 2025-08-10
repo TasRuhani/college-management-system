@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+local_settings.py
+media/
+
+# Environment variables
+.env
+
+# Node.js / Tailwind CSS
+node_modules/
+
+# Editor & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

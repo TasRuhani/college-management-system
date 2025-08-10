@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-3xl font-bold mb-2">{{ course.name }}</h2>
+<p class="text-lg text-gray-600 mb-6">Course Code: {{ course.course_code }}</p>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-4">Take Attendance for {{ "today"|date:"F d, Y" }}</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <ul class="space-y-3">
+                {% for student in students %}
+                <li class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span>{{ student.user.first_name }} {{ student.user.last_name }}</span>
+                    <input type="checkbox" name="student_{{ student.user.id }}" class="h-5 w-5 rounded">
+                </li>
+                {% endfor %}
+            </ul>
+            <button type="submit" class="mt-4 w-full py-2 px-4 bg-green-600 hover:bg-green-700 rounded-md text-white">Save Attendance</button>
+        </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">Assignments</h3>
+            <a href="{% url 'add_assignment' course.id %}" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-sm">+ Add Assignment</a>
+        </div>
+        <ul class="space-y-2">
+            {% for assignment in assignments %}
+                <li class="p-3 bg-gray-50 rounded-md">
+                    <p class="font-semibold">{{ assignment.title }}</p>
+                    <p class="text-sm text-gray-600">Due: {{ assignment.due_date }}</p>
+                </li>
+            {% empty %}
+                <li>No assignments created yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

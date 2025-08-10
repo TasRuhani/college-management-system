@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="text-3xl font-bold mb-4">Welcome, {{ student.user.first_name }}</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Attendance Card -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-2">Attendance</h3>
+        <!-- Add attendance data here -->
+    </div>
+    <!-- Exam Marks Card -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-2">Exam Marks</h3>
+        <!-- Add exam marks data here -->
+    </div>
+    <!-- Assignments Card -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-2">Assignments</h3>
+        <!-- Add assignments data here -->
+    </div>
+</div>
+{% endblock %}
