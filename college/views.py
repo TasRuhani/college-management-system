@@ -1,11 +1,7 @@
-# college/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-
-# ↓↓ REMOVED 'News' FROM THE IMPORTS ↓↓
 from .models import Student, Faculty, Course, Assessment, Attendance
 from .forms import LoginForm, AttendanceForm, AssignmentForm
 
@@ -31,6 +27,8 @@ def login_view(request):
                 return redirect('teacher_dashboard')
             else:
                 return redirect('/admin/')
+        else:
+            form.add_error(None, "Your username and password didn't match. Please try again.")
 
     return render(request, 'login.html', {'form': form})
 
@@ -40,8 +38,7 @@ def logout_view(request):
 
 @login_required
 def student_dashboard(request):
-    # ↓↓ CORRECTED THIS QUERY ↓↓
-    # Query by the primary key (pk) of the logged-in user
+
     student = get_object_or_404(Student, pk=request.user.pk)
     
     courses = student.enrolled_courses.all()

@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
-<head>
+<html lang="en" class="dark"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Management System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <title>{% block title %}College System{% endblock %}</title>
+    
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+      /* Apply the modern font */
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-800 p-4 text-white">
-        <div class="container mx-auto">
-            <h1 class="text-2xl">College Management System</h1>
+<body class="bg-gray-900 text-gray-200 antialiased">
+
+    <nav class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-xl font-bold text-white">College Portal</a>
+                </div>
+                <div class="flex items-center">
+                    {% if user.is_authenticated %}
+                        <span class="text-gray-400 mr-4">Welcome, {{ user.first_name|default:user.username }}</span>
+                        <a href="{% url 'logout' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md text-sm">Logout</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </nav>
-    <main class="container mx-auto p-4">
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% block content %}
         {% endblock %}
     </main>
+
 </body>
 </html>
