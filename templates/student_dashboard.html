@@ -8,28 +8,59 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    
+
     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
         <h3 class="text-xl font-semibold text-white mb-4">Enrolled Courses</h3>
         <ul class="space-y-2">
             {% for course in courses %}
-                <li class="p-3 bg-gray-700/50 rounded-md text-gray-300">{{ course.course_name }}</li>
+            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300">{{ course.course_name }}</li>
             {% empty %}
-                <li class="text-gray-400">Not enrolled in any courses.</li>
+            <li class="text-gray-400">Not enrolled in any courses.</li>
             {% endfor %}
         </ul>
     </div>
 
-    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 col-span-1 md:col-span-2">
-        <h3 class="text-xl font-semibold text-white mb-4">Upcoming Assessments</h3>
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+        <h3 class="text-xl font-semibold text-white mb-4">Attendance Report</h3>
         <ul class="space-y-2">
-            {% for assessment in assessments %}
-                <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 flex justify-between">
-                    <span>{{ assessment.assessment_name }} ({{ assessment.get_type_display }})</span>
-                    <span class="text-gray-400">{{ assessment.course.course_name }}</span>
-                </li>
+            {% for data in attendance_data %}
+            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 flex justify-between items-center">
+                <span>{{ data.course.course_name }}</span>
+                <span class="font-semibold px-2 py-1 rounded-full text-sm
+                        {% if data.percentage > 50 %}
+                            bg-green-500/20 text-green-300
+                        {% else %}
+                            bg-red-500/20 text-red-300
+                        {% endif %}">
+                    {{ data.percentage|floatformat:2 }}%
+                </span>
+            </li>
             {% empty %}
-                <li class="text-gray-400">No upcoming assessments.</li>
+            <li class="text-gray-400">No attendance records found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 col-span-1 lg:col-span-3">
+        <h3 class="text-xl font-semibold text-white mb-4">Assessments</h3>
+        <ul class="space-y-2">
+            {% for item in assessments_with_results %}
+            <li class="p-3 bg-gray-700/50 text-white rounded-md grid grid-cols-3 gap-4 items-center">
+                <span class="col-span-2 flex items-baseline gap-x-[20vh]">
+                    <span class="font-semibold text-white">{{ item.assessment.assessment_name }}</span>
+                    <span class="text-gray-200">( {{ item.assessment.course.course_name }} )</span>
+                </span>
+                <span class="text-right font-semibold">
+                    {% if item.result %}
+                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks
+                        }}</span>
+                    {% else %}
+                    <span class="text-gray-500">Not Graded</span>
+                    {% endif %}
+                </span>
+            </li>
+            {% empty %}
+            <li class="text-gray-400">No assessments found.</li>
             {% endfor %}
         </ul>
     </div>

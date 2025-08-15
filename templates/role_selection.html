@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Select Role{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[70vh]">
+    <div class="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+        <h2 class="text-3xl font-bold text-center text-white">Welcome, <span class="text-indigo-400 font-semibold">{{ user.first_name|default:user.username }}</span></h2>
+        <p class="text-center text-gray-400">Where do you wanna log into?</p>
+        
+        <div class="space-y-4 pt-4">
+            <a href="{% url 'teacher_dashboard' %}" class="block w-full text-center py-3 px-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-bold transition duration-300">
+                Go to Faculty Dashboard
+            </a>
+            <a href="/admin/" class="block w-full text-center py-3 px-4 bg-gray-600 hover:bg-gray-700 rounded-lg text-white font-bold transition duration-300">
+                Go to Admin Panel
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
