@@ -86,7 +86,7 @@
                                 </span>
 
                                 <span class="flex items-center justify-center text-xs font-semibold px-3 py-1 rounded-full text-center
-                                    {% if data.attendance_percentage > 75 %}
+                                    {% if data.attendance_percentage >= 75 %}
                                         bg-green-500/20 text-green-300
                                     {% elif data.attendance_percentage >= 50 %}
                                         bg-yellow-500/20 text-yellow-300
@@ -156,8 +156,8 @@
         <a href="{% url 'assessment_detail' assessment.assessment_id %}"
             class="block p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
             <p class="font-semibold text-white">{{ assessment.assessment_name }}</p>
-            <p class="text-sm text-gray-400 flex justify-between"><span>Type: {{ assessment.get_type_display
-                    }}</span><span>Full Marks: {{ assessment.assessment_full_marks }}</span></p>
+            <p class="text-sm text-gray-400 flex justify-between"><span>Type: {{ assessment.get_type_display }}</span>
+                <span>Full Marks: {{ assessment.assessment_full_marks }}</span></p>
         </a>
         {% empty %}
         <p class="text-gray-400">No assessments created yet.</p>
