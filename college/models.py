@@ -43,7 +43,7 @@ class Faculty(models.Model):
 class Course(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=100)
-    course_code = models.CharField(max_length=10, unique=True)
+    course_code = models.CharField(max_length=15, unique=True)
     dept = models.ForeignKey(Department, on_delete=models.CASCADE)
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, blank=True)
 
