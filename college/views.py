@@ -52,8 +52,6 @@ def student_dashboard(request):
 
 @login_required
 def teacher_dashboard(request):
-    # ↓↓ CORRECTED THIS QUERY ↓↓
-    # Query by the primary key (pk) of the logged-in user
     teacher = get_object_or_404(Faculty, pk=request.user.pk)
 
     courses = Course.objects.filter(faculty=teacher)
@@ -102,5 +100,3 @@ def add_assignment_view(request, course_id):
         form = AssignmentForm()
 
     return render(request, 'add_assignment.html', {'form': form, 'course': course})
-
-# ↓↓ DELETED THE ENTIRE news_board FUNCTION ↓↓

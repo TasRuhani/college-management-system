@@ -1,7 +1,4 @@
-# college/forms.py
-
 from django import forms
-# ↓↓ CORRECTED THE IMPORTS ↓↓
 from .models import Attendance, Assessment
 
 class LoginForm(forms.Form):
@@ -13,9 +10,10 @@ class AttendanceForm(forms.ModelForm):
         model = Attendance
         fields = ['status']
 
-# ↓↓ CORRECTED TO USE 'Assessment' MODEL ↓↓
 class AssignmentForm(forms.ModelForm):
     class Meta:
-        model = Assessment # Changed from Assignment
-        # Use the fields from the Assessment model
+        model = Assessment 
         fields = ['assessment_name', 'assessment_full_marks']
+
+class CsvImportForm(forms.Form):
+    csv_file = forms.FileField()
