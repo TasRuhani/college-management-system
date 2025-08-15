@@ -16,7 +16,6 @@ def role_selection_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        # Handle redirection for already logged-in users
         if request.user.is_staff and hasattr(request.user, 'faculty'):
             return redirect('select_role')
         elif request.user.user_type == 'faculty':
@@ -35,11 +34,8 @@ def login_view(request):
         if user is not None:
             login(request, user)
             
-            # --- Corrected Redirect Logic ---
-            # Check for the special dual-role case first
             if user.is_staff and hasattr(user, 'faculty'):
                 return redirect('select_role')
-            # Then, check for individual roles
             elif user.user_type == 'faculty':
                 return redirect('teacher_dashboard')
             elif user.user_type == 'student':
@@ -62,7 +58,6 @@ def student_dashboard(request):
     student = get_object_or_404(Student, pk=request.user.pk)
     courses = student.enrolled_courses.all()
     
-    # Updated logic to fetch assessments and their results
     assessments_with_results = []
     all_assessments = Assessment.objects.filter(course__in=courses).order_by('course')
     for assessment in all_assessments:
@@ -117,7 +112,6 @@ def course_detail_view(request, course_id):
     view_date_str = request.GET.get('date', timezone.now().strftime("%Y-%m-%d"))
     view_date = timezone.datetime.strptime(view_date_str, "%Y-%m-%d").date()
 
-    # This is the corrected line
     present_student_ids = Attendance.objects.filter(
         course=course, date=view_date, status=True
     ).values_list('student__user__id', flat=True)
@@ -169,7 +163,7 @@ def assessment_detail_view(request, assessment_id):
     if request.method == 'POST':
         for student in students:
             marks = request.POST.get(f'marks_{student.user.id}')
-            if marks: # Only update if marks were entered
+            if marks: 
                 Result.objects.update_or_create(
                     student=student,
                     assessment=assessment,

@@ -7,7 +7,6 @@ from django.contrib.auth.admin import UserAdmin
 from .models import User, Department, Faculty, Course, Student, Enrollment, Attendance, Assessment, Result
 from .forms import CsvImportForm
 
-# A Mixin for adding a generic "Export as CSV" action
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
         meta = self.model._meta
@@ -21,7 +20,6 @@ class ExportCsvMixin:
         return response
     export_as_csv.short_description = "Export Selected as CSV"
 
-# An inline view to show enrolled students on the Course page
 class EnrollmentInline(admin.TabularInline):
     model = Enrollment
     extra = 0
@@ -37,11 +35,10 @@ class EnrollmentInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
 
-# Custom Admin Configurations for each model
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display = ('course_name', 'course_code', 'dept', 'faculty')
-    actions = ["import_from_csv", "export_as_csv"] # Added import action
+    actions = ["import_from_csv", "export_as_csv"] 
     inlines = [EnrollmentInline]
 
     def get_urls(self):
@@ -58,15 +55,11 @@ class CourseAdmin(admin.ModelAdmin, ExportCsvMixin):
                 reader = csv.DictReader(decoded_file)
                 
                 for row in reader:
-                    # Find the related Department
                     try:
                         department = Department.objects.get(dept_name=row['dept_name'])
                     except Department.DoesNotExist:
-                        # Skip row if department doesn't exist, or create it
-                        # For now, we'll skip it.
                         continue
 
-                    # Find the related Faculty (if provided)
                     faculty = None
                     if row.get('faculty_username'):
                         try:
@@ -75,7 +68,6 @@ class CourseAdmin(admin.ModelAdmin, ExportCsvMixin):
                         except (User.DoesNotExist, Faculty.DoesNotExist):
                             faculty = None
 
-                    # Create the Course, avoiding duplicates based on course_code
                     Course.objects.get_or_create(
                         course_code=row['course_code'],
                         defaults={
@@ -120,7 +112,7 @@ class StudentAdmin(admin.ModelAdmin, ExportCsvMixin):
                 decoded_file = csv_file.read().decode('utf-8').splitlines()
                 reader = csv.DictReader(decoded_file)
                 for row in reader:
-                    username = row.get('username') or row['roll_no'] # Use username if present, else fallback to roll_no
+                    username = row.get('username') or row['roll_no']
                     user, created = User.objects.get_or_create(
                         username=username,
                         defaults={
@@ -210,10 +202,8 @@ class CustomUserAdmin(UserAdmin, ExportCsvMixin):
                 decoded_file = csv_file.read().decode('utf-8').splitlines()
                 reader = csv.DictReader(decoded_file)
                 for row in reader:
-                    # Read the staff_status from the CSV and convert it to a boolean
                     is_staff_value = row.get('is_staff', 'FALSE').lower() == 'true'
                     
-                    # Use create_user to properly hash passwords
                     User.objects.create_user(
                         username=row['username'],
                         password=row['password'],
@@ -221,7 +211,7 @@ class CustomUserAdmin(UserAdmin, ExportCsvMixin):
                         first_name=row['first_name'],
                         last_name=row['last_name'],
                         user_type=row['user_type'],
-                        is_staff=is_staff_value # Pass the value here
+                        is_staff=is_staff_value 
                     )
                 self.message_user(request, "Users have been imported from the CSV file.")
                 return redirect("..")
@@ -233,7 +223,6 @@ class CustomUserAdmin(UserAdmin, ExportCsvMixin):
         return redirect("import-csv/")
     import_from_csv.short_description = "Import Users from CSV"
 
-# Register other models with export functionality
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin, ExportCsvMixin):
     actions = ["export_as_csv"]
@@ -241,7 +230,7 @@ class DepartmentAdmin(admin.ModelAdmin, ExportCsvMixin):
 @admin.register(Enrollment)
 class EnrollmentAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display = ('student', 'course', 'enrollment_date')
-    actions = ["import_from_csv", "export_as_csv"] # Added import action
+    actions = ["import_from_csv", "export_as_csv"] 
 
     def get_urls(self):
         urls = super().get_urls()
@@ -258,17 +247,14 @@ class EnrollmentAdmin(admin.ModelAdmin, ExportCsvMixin):
                 
                 for row in reader:
                     try:
-                        # Find the student and course from the CSV data
                         student = Student.objects.get(roll_no=row['student_roll_no'])
                         course = Course.objects.get(course_code=row['course_code'])
                         
-                        # Create the enrollment link if it doesn't already exist
                         Enrollment.objects.get_or_create(
                             student=student,
                             course=course
                         )
                     except (Student.DoesNotExist, Course.DoesNotExist):
-                        # If a student or course is not found, just skip this row
                         continue
                 
                 self.message_user(request, "Your csv file has been imported")

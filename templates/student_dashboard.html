@@ -4,16 +4,19 @@
 {% block content %}
 <div class="mb-8">
     <h1 class="text-3xl font-bold text-white">Student Dashboard</h1>
-    <p class="text-lg text-gray-400">Welcome back, {{ student.name }}!</p>
+    <p class="text-xl my-2 text-gray-400">Welcome back, <span class="text-indigo-400 font-semibold">{{ student.name }}!</span></p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
         <h3 class="text-xl font-semibold text-white mb-4">Enrolled Courses</h3>
         <ul class="space-y-2">
             {% for course in courses %}
-            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300">{{ course.course_name }}</li>
+            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 flex justify-between">
+                <span>{{ course.course_name }}</span>
+                <span>{{ course.course_code}}</span>
+            </li>
             {% empty %}
             <li class="text-gray-400">Not enrolled in any courses.</li>
             {% endfor %}
@@ -41,7 +44,7 @@
         </ul>
     </div>
 
-    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 col-span-1 lg:col-span-3">
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 col-span-1 lg:col-span-2">
         <h3 class="text-xl font-semibold text-white mb-4">Assessments</h3>
         <ul class="space-y-2">
             {% for item in assessments_with_results %}
@@ -52,8 +55,7 @@
                 </span>
                 <span class="text-right font-semibold">
                     {% if item.result %}
-                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks
-                        }}</span>
+                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks }}</span>
                     {% else %}
                     <span class="text-gray-500">Not Graded</span>
                     {% endif %}
