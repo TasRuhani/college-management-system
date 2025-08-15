@@ -147,7 +147,6 @@ def add_assignment_view(request, course_id):
         if form.is_valid():
             assessment = form.save(commit=False)
             assessment.course = course
-            assessment.type = 'assignment'
             assessment.save()
             return redirect('course_detail', course_id=course.course_id)
     else:

@@ -3,30 +3,63 @@
 {% block title %}{{ course.course_name }}{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">{{ course.course_name }}</h1>
-    <p class="text-lg text-gray-400">Course Code: {{ course.course_code }}</p>
+<style>
+    input[type="date"]#date-picker {
+        padding-right: 2.5rem;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23ffffff" d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v13c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15H5V9h14v10z"/></svg>');
+        background-repeat: no-repeat;
+        background-position: right 0.65rem center;
+        background-size: 1.25rem 1.25rem;
+        background-color: transparent;
+        color: inherit;
+    }
+
+    input[type="date"]#date-picker::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        cursor: pointer;
+    }
+
+    input[type="date"]#date-picker::-ms-clear {
+        display: none;
+    }
+
+    input[type="date"]#date-picker::-moz-focus-inner {
+        border: 0;
+    }
+</style>
+
+<div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ course.course_name }}</h1>
+    <p class="text-base sm:text-lg text-gray-400">Course Code: {{ course.course_code }}</p>
 </div>
 
 <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-lg mb-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
 
-        <div class="lg:col-span-2 p-8 border-b lg:border-b-0 lg:border-r border-gray-700/50">
-            <h2 class="text-2xl font-bold text-white mb-6">Manage Attendance</h2>
+        <div class="lg:col-span-2 p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-gray-700/50">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">Manage Attendance</h2>
 
             <form method="GET" action="{% url 'course_detail' course.course_id %}"
-                class="flex items-center gap-x-4 mb-6 bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
-                <label for="date-picker" class="font-medium text-gray-300 whitespace-nowrap">Select Date:</label>
+                class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6 bg-gray-900/50 p-3 sm:p-4 rounded-lg border border-gray-700/50">
+
+                <label for="date-picker" class="font-bold my-2 text-gray-300 whitespace-nowrap hidden sm:block">
+                    Select Date:
+                </label>
+
                 <input type="date" id="date-picker" name="date" value="{{ view_date|date:'Y-m-d' }}"
                     class="bg-gray-700 border border-gray-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
                 <button type="submit"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-200">
                     View
                 </button>
             </form>
 
-            <h3 class="text-xl font-semibold text-white mb-4">
-                Marking for: 
+
+            <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">
+                Marking for:
                 <span class="text-indigo-400">{{ view_date|date:"F d, Y" }}</span>
             </h3>
 
@@ -36,29 +69,38 @@
                 <div class="space-y-3">
                     {% for data in student_data %}
                     <label
-                        class="flex items-center justify-between p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200 cursor-pointer">
-                        <div class="grid grid-cols-3 items-center w-full gap-4">
-                            <span class="text-gray-200">
+                        class="p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200 cursor-pointer block">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-4 items-center gap-3 w-full">
+
+                            <span class="text-gray-200 text-left lg:text-center px-4 font-semibold text-left whitespace-nowrap">
                                 {{ data.student.name }}
                             </span>
 
-                            <span class="text-gray-400">
-                                {{ data.student.roll_no }}
-                            </span>
+                            <div class="flex px-8 justify-end lg:justify-between items-center gap-6 col-span-1 lg:col-span-3">
 
-                            <span class="text-xs font-semibold mx-[70px] py-[10px] rounded-full text-center
+                                <span class="text-gray-400">
+                                    {{ data.student.roll_no }}
+                                </span>
+
+                                <span class="flex items-center justify-center text-xs font-semibold px-3 py-1 rounded-full text-center
                                 {% if data.attendance_percentage > 50 %}
                                     bg-green-500/20 text-green-300
                                 {% else %}
                                     bg-red-500/20 text-red-300
                                 {% endif %}">
-                                {{ data.attendance_percentage|floatformat:2 }}%
-                            </span>
+                                    {{ data.attendance_percentage|floatformat:2 }}%
+                                </span>
+
+                                <input type="checkbox" name="student_{{ data.student.user.id }}"
+                                    class="h-5 w-5 mr-2 rounded bg-gray-600 border-gray-500 text-indigo-500 mr-2 focus:ring-indigo-600"
+                                    {% if data.is_present_today %}checked{% endif %}>
+                            </div>
+
                         </div>
-                        <input type="checkbox" name="student_{{ data.student.user.id }}"
-                            class="h-5 w-5 rounded bg-gray-600 border-gray-500 text-indigo-500 focus:ring-indigo-600"
-                            {% if data.is_present_today %}checked{% endif %}>
                     </label>
+
+
                     {% endfor %}
                 </div>
                 <button type="submit"
@@ -68,16 +110,15 @@
             </form>
         </div>
 
-        <div class="p-8">
-            <h2 class="text-2xl font-bold text-white mb-6">History</h2>
+        <div class="p-6 sm:p-8">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">History</h2>
             <div class="space-y-3 max-h-[28rem] overflow-y-auto pr-2">
                 {% for record in attendance_summary %}
                 <a href="?date={{ record.date|date:'Y-m-d' }}"
                     class="block p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-row justify-between items-center gap-2">
                         <span class="font-medium text-indigo-400">{{ record.date|date:"F d, Y" }}</span>
-                        <span
-                            class="text-sm font-semibold px-2 py-1 rounded-full 
+                        <span class="text-sm font-semibold px-2 py-1 rounded-full 
                             {% if record.present_count == students|length %}
                                 bg-green-500/20 text-green-300
                             {% else %}
@@ -96,22 +137,24 @@
     </div>
 </div>
 
-<div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-lg p-8">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-white">Assessments</h2>
-        <a href="{% url 'add_assignment' course.course_id %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md text-sm">
+<div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl shadow-lg p-6 sm:p-8">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 class="text-xl sm:text-2xl font-bold text-white">Assessments</h2>
+        <a href="{% url 'add_assignment' course.course_id %}"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md text-sm">
             + Add Assessment
         </a>
     </div>
 
     <div class="space-y-3">
         {% for assessment in assessments %}
-            <a href="{% url 'assessment_detail' assessment.assessment_id %}" class="block p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
-                <p class="font-semibold text-white">{{ assessment.assessment_name }}</p>
-                <p class="text-sm text-gray-400">Type: {{ assessment.get_type_display }} | Full Marks: {{ assessment.assessment_full_marks }}</p>
-            </a>
+        <a href="{% url 'assessment_detail' assessment.assessment_id %}"
+            class="block p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
+            <p class="font-semibold text-white">{{ assessment.assessment_name }}</p>
+            <p class="text-sm text-gray-400 flex justify-between"><span>Type: {{ assessment.get_type_display }}</span><span>Full Marks: {{ assessment.assessment_full_marks }}</span></p>
+        </a>
         {% empty %}
-            <p class="text-gray-400">No assessments created yet.</p>
+        <p class="text-gray-400">No assessments created yet.</p>
         {% endfor %}
     </div>
 </div>

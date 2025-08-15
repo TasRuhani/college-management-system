@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}Faculty Dashboard{% endblock %}
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-white">Faculty Dashboard</h1>
-    <p class="text-lg text-gray-400">Welcome back, {{ teacher.faculty_name }}!</p>
+<div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-white">Faculty Dashboard</h1>
+    <p class="text-base sm:text-lg text-gray-400">Welcome back, <span class="text-indigo-400 font-semibold">{{ teacher.faculty_name }}!</span></p>
 </div>
-<div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-    <h3 class="text-xl font-semibold text-white mb-4">Your Courses</h3>
+<div class="bg-gray-800 p-6 sm:p-8 rounded-xl border border-gray-700">
+    <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Your Courses</h3>
     <div class="space-y-3">
         {% for course in courses %}
             <a href="{% url 'course_detail' course.course_id %}" class="block p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
                 <p class="font-semibold text-white">{{ course.course_name }}</p>
-                <p class="text-sm text-gray-400">{{ course.dept.dept_name }} - {{ course.course_code }}</p>
+                <p class="text-sm text-gray-400">{{ course.dept.dept_name }}  {{ course.course_code }}</p>
             </a>
         {% empty %}
             <p class="text-gray-400">You are not assigned to any courses.</p>

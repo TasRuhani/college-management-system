@@ -13,12 +13,15 @@ class AttendanceForm(forms.ModelForm):
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assessment
-        fields = ['assessment_name', 'type','assessment_full_marks']
+        fields = ['assessment_name', 'type', 'assessment_full_marks']
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['assessment_name'].initial = "New Assessment"
-        self.fields['type'].initial = 'exam'
-        self.fields['assessment_full_marks'].initial = 100
+
+        if not self.is_bound:
+            self.fields['assessment_name'].initial = "New Assessment"
+            self.fields['assessment_full_marks'].initial = 100
+
 
 class CsvImportForm(forms.Form):
     csv_file = forms.FileField()
