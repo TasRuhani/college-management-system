@@ -90,3 +90,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'college.User'
 
 LOGOUT_REDIRECT_URL = '/'
+
