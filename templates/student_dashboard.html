@@ -7,34 +7,19 @@
     <p class="text-base sm:text-xl my-2 text-gray-400">Welcome back, <span class="text-indigo-400 font-semibold">{{ student.name }}!</span></p>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
-        <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Enrolled Courses</h3>
-        <ul class="space-y-2">
-            {% for course in courses %}
-            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 flex justify-between">
-                <span>{{ course.course_name }}</span>
-                <span>{{ course.course_code}}</span>
-            </li>
-            {% empty %}
-            <li class="text-gray-400">Not enrolled in any courses.</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+    <div class="bg-gray-800 p-6 mb-6 rounded-xl border border-gray-700">
         <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Attendance Report</h3>
         <ul class="space-y-2">
             {% for data in attendance_data %}
-            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 flex justify-between items-center">
+            <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 grid grid-cols-3 gap-4 items-center">
                 <span>{{ data.course.course_name }}</span>
-                <span class="font-semibold px-2 py-1 rounded-full text-sm
-                        {% if data.percentage > 50 %}
-                            bg-green-500/20 text-green-300
-                        {% else %}
-                            bg-red-500/20 text-red-300
-                        {% endif %}">
+                <span class="px-2 text-xs sm:text-lg">{{ data.course.course_code }}</span>
+                <span class="font-semibold mx-auto px-4 py-1 rounded-full text-sm text-center
+                    {% if data.percentage > 50 %}
+                        bg-green-500/20 text-green-300
+                    {% else %}
+                        bg-red-500/20 text-red-300
+                    {% endif %}">
                     {{ data.percentage|floatformat:2 }}%
                 </span>
             </li>
@@ -44,7 +29,8 @@
         </ul>
     </div>
 
-    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 col-span-1 lg:col-span-2">
+
+    <div class="bg-gray-800 p-6  rounded-xl border border-gray-700 col-span-1 lg:col-span-2">
         <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Assessments</h3>
         <ul class="space-y-2">
             {% for item in assessments_with_results %}
@@ -57,7 +43,8 @@
                 </div>
                 <div class="text-right font-semibold">
                     {% if item.result %}
-                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks }}</span>
+                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks
+                        }}</span>
                     {% else %}
                     <span class="text-gray-500">Not Graded</span>
                     {% endif %}
@@ -68,6 +55,4 @@
             {% endfor %}
         </ul>
     </div>
-
-</div>
 {% endblock %}

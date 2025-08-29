@@ -58,13 +58,13 @@
                 <!-- Left Side: Logo & Title -->
                 <div class="flex items-center space-x-3 flex-shrink-0">
                     <img src="{% static 'assets/logo.png' %}" alt="Logo" class="h-8 w-8 object-contain">
-                    <a href="/" class="text-xl font-bold text-white whitespace-nowrap">EduNexus</a>
+                    <a href="/" class="text-sm sm:text-lg font-bold text-white whitespace-nowrap">EduNexus</a>
                 </div>
 
                 <!-- Right Side: Full Name & Logout -->
                 <div class="flex items-center space-x-3 justify-end whitespace-nowrap flex-shrink-0">
                     {% if user.is_authenticated %}
-                    <span class="text-white font-semibold mr-2 whitespace-nowrap text-sm sm:text-base truncate max-w-[150px]">
+                    <span class="text-white font-semibold mr-1 whitespace-nowrap text-xs sm:text-lg">
                         {{ user.get_full_name|default:user.username }}
                     </span>
                     <a href="{% url 'logout' %}"
