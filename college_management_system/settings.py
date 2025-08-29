@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'college',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +77,29 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+#pwa settings
+PWA_APP_NAME = 'EduNexus College Portal'
+PWA_APP_DESCRIPTION = "College Management System"
+PWA_APP_THEME_COLOR = '#2A2A3E'
+PWA_APP_BACKGROUND_COLOR = '#1E1E2D'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/images/logo.png',
+        'sizes': '192x192'
+    }
+]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': '/static/images/logo.png',
+        'sizes': '192x192'
+    }
+]
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
