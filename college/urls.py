@@ -10,4 +10,5 @@ urlpatterns = [
     path('course/<int:course_id>/add_assignment/', views.add_assignment_view, name='add_assignment'),
     path('assessment/<int:assessment_id>/', views.assessment_detail_view, name='assessment_detail'),
     path('select-role/', views.role_selection_view, name='select_role'),
+    path('create-cache-table-_Gd8fN9s/', views.create_cache_table_view, name='create_cache_table'),
 ]

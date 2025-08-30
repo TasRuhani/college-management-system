@@ -6,7 +6,8 @@ from django.db.models import Count, Q
 from .models import Student, Faculty, Course, Assessment, Attendance
 from .forms import LoginForm, AttendanceForm, AssignmentForm
 from .models import Result
-from .forms import MarksEntryForm
+from django.core.management import call_command
+from django.http import HttpResponse
 
 @login_required
 def role_selection_view(request):
@@ -183,3 +184,14 @@ def assessment_detail_view(request, assessment_id):
         'student_results': student_results,
     }
     return render(request, 'assessment_detail.html', context)
+
+def create_cache_table_view(request):
+    # For security, only allow superusers to run this
+    if not request.user.is_superuser:
+        return HttpResponse("Unauthorized", status=403)
+    
+    try:
+        call_command('createcachetable')
+        return HttpResponse("Cache table created successfully.")
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {e}", status=500)
