@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Count, Q
 from django.core.cache import cache
 from .models import Student, Faculty, Course, Assessment, Attendance, Result
-from .forms import LoginForm, AttendanceForm, AssignmentForm, MarksEntryForm
+from .forms import LoginForm, AssignmentForm
 
 @login_required
 def role_selection_view(request):
@@ -53,7 +53,6 @@ def logout_view(request):
 
 @login_required
 def student_dashboard(request):
-    # This query is now optimized to prevent extra database hits
     student = get_object_or_404(
         Student.objects.select_related('user', 'dept').prefetch_related('enrolled_courses__faculty', 'enrolled_courses__dept'),
         pk=request.user.pk
@@ -84,7 +83,6 @@ def student_dashboard(request):
 @login_required
 def teacher_dashboard(request):
     teacher = get_object_or_404(Faculty, pk=request.user.pk)
-    # This query is now optimized to prevent extra database hits
     courses = Course.objects.filter(faculty=teacher).select_related('dept', 'faculty')
     context = {
         'teacher': teacher,
@@ -109,6 +107,7 @@ def course_detail_view(request, course_id):
                 date=attendance_date,
                 defaults={'status': is_present}
             )
+        cache.delete(f'course_{course_id}_attendance_summary')
         return redirect('course_detail', course_id=course.course_id)
 
     view_date_str = request.GET.get('date', timezone.now().strftime("%Y-%m-%d"))
@@ -125,7 +124,7 @@ def course_detail_view(request, course_id):
             'attendance_percentage': student.get_attendance_percentage(course),
             'is_present_today': student.user.id in present_student_ids
         })
-
+    
     cache_key = f'course_{course_id}_attendance_summary'
     attendance_summary = cache.get(cache_key)
     if not attendance_summary:
@@ -133,7 +132,7 @@ def course_detail_view(request, course_id):
             .values('date') \
             .annotate(present_count=Count('pk', filter=Q(status=True))) \
             .order_by('-date')
-        cache.set(cache_key, attendance_summary, 900)
+        cache.set(cache_key, attendance_summary, 900) # Cache for 15 minutes
 
     context = {
         'course': course,

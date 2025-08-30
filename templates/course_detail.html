@@ -57,16 +57,22 @@
                 </button>
             </form>
 
-
-            <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">
-                Marking for:
-                <span class="text-indigo-400">{{ view_date|date:"F d, Y" }}</span>
-            </h3>
-
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="attendance_date" value="{{ view_date|date:'Y-m-d' }}">
-                <div class="space-y-3">
+
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h3 class="text-lg sm:text-xl font-semibold text-white">
+                        Marking for:
+                        <span class="text-indigo-400">{{ view_date|date:"F d, Y" }}</span>
+                    </h3>
+                    <div class="flex gap-2">
+                        <button type="button" id="select-all" class="text-xs bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded-md">Select All</button>
+                        <button type="button" id="deselect-all" class="text-xs bg-gray-600 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded-md">Deselect All</button>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 max-h-[1vh] overflow-y-auto pr-2">
                     {% for data in student_data %}
                     <label
                         class="p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200 cursor-pointer block">
@@ -98,14 +104,12 @@
 
 
                                 <input type="checkbox" name="student_{{ data.student.user.id }}"
-                                    class="h-5 w-5 mr-2 rounded bg-gray-600 border-gray-500 text-indigo-500 mr-2 focus:ring-indigo-600"
+                                    class="attendance-checkbox h-5 w-5 mr-2 rounded bg-gray-600 border-gray-500 text-indigo-500 mr-2 focus:ring-indigo-600"
                                     {% if data.is_present_today %}checked{% endif %}>
                             </div>
 
                         </div>
                     </label>
-
-
                     {% endfor %}
                 </div>
                 <button type="submit"
@@ -116,8 +120,8 @@
         </div>
 
         <div class="p-6 sm:p-8">
-            <h2 class="text-xl sm:text-2xl font-bold text-white mb-4">History</h2>
-            <div class="space-y-3 max-h-[28rem] overflow-y-auto pr-2">
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-8">History</h2>
+            <div class="space-y-3 max-h-[1vh] overflow-y-auto pr-2">
                 {% for record in attendance_summary %}
                 <a href="?date={{ record.date|date:'Y-m-d' }}"
                     class="block p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
@@ -164,4 +168,26 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAllBtn = document.getElementById('select-all');
+    const deselectAllBtn = document.getElementById('deselect-all');
+    const checkboxes = document.querySelectorAll('.attendance-checkbox');
+
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', () => {
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+        });
+    }
+
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', () => {
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+        });
+    }
+});
+</script>
+
 {% endblock %}
+
