@@ -43,8 +43,7 @@
                 </div>
                 <div class="text-right font-semibold">
                     {% if item.result %}
-                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks
-                        }}</span>
+                    {{ item.result.marks }} / <span class="text-gray-400">{{ item.assessment.assessment_full_marks }}</span>
                     {% else %}
                     <span class="text-gray-500">Not Graded</span>
                     {% endif %}
