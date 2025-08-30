@@ -24,7 +24,7 @@ class Faculty(models.Model):
     TITLE_CHOICES = (
         ('assistant_prof', 'Assistant Professor'),
         ('associate_prof', 'Associate Professor'),
-        ('hod', 'HOD of Department'),
+        ('hod', 'Head of Department'),
         ('non_teaching', 'Non-teaching Staff'),
     )
 
