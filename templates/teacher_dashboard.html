@@ -11,7 +11,7 @@
         {% for course in courses %}
             <a href="{% url 'course_detail' course.course_id %}" class="block p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
                 <p class="font-bold text-xl text-white">{{ course.course_name }}</p>
-                <p class="text-sm text-gray-400">{{ course.dept.dept_name }}<span class="px-2">{{ course.course_code }}</span></p>
+                <p class="text-sm text-gray-400">{{ course.dept.dept_name }} <span class="px-2 font-bold">—<span class="px-2">{{ course.course_code }}</span></p>
             </a>
         {% empty %}
             <p class="text-gray-400">You are not assigned to any courses.</p>

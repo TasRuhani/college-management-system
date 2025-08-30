@@ -3,9 +3,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Count, Q
-from .models import Student, Faculty, Course, Assessment, Attendance
-from .forms import LoginForm, AttendanceForm, AssignmentForm
-from .models import Result
+from django.core.cache import cache
+from .models import Student, Faculty, Course, Assessment, Attendance, Result
+from .forms import LoginForm, AttendanceForm, AssignmentForm, MarksEntryForm
 
 @login_required
 def role_selection_view(request):
@@ -15,7 +15,7 @@ def role_selection_view(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        if request.user.is_staff and hasattr(request.user, 'faculty'):
+        if hasattr(request.user, 'faculty') and request.user.is_superuser:
             return redirect('select_role')
         elif request.user.user_type == 'faculty':
             return redirect('teacher_dashboard')
@@ -32,8 +32,7 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            
-            if user.is_staff and hasattr(user, 'faculty'):
+            if hasattr(user, 'faculty') and user.is_superuser:
                 return redirect('select_role')
             elif user.user_type == 'faculty':
                 return redirect('teacher_dashboard')
@@ -54,9 +53,13 @@ def logout_view(request):
 
 @login_required
 def student_dashboard(request):
-    student = get_object_or_404(Student, pk=request.user.pk)
-    courses = student.enrolled_courses.all()
+    # This query is now optimized to prevent extra database hits
+    student = get_object_or_404(
+        Student.objects.select_related('user', 'dept').prefetch_related('enrolled_courses__faculty', 'enrolled_courses__dept'),
+        pk=request.user.pk
+    )
     
+    courses = student.enrolled_courses.all()
     assessments_with_results = []
     all_assessments = Assessment.objects.filter(course__in=courses).order_by('course')
     for assessment in all_assessments:
@@ -66,23 +69,23 @@ def student_dashboard(request):
             'result': result
         })
     
-    attendance_data = []
+    course_data = []
     for course in courses:
         percentage = student.get_attendance_percentage(course)
-        attendance_data.append({'course': course, 'percentage': percentage})
+        course_data.append({'course': course, 'percentage': percentage})
 
     context = {
         'student': student,
-        'courses': courses,
+        'course_data': course_data,
         'assessments_with_results': assessments_with_results,
-        'attendance_data': attendance_data,
     }
     return render(request, 'student_dashboard.html', context)
 
 @login_required
 def teacher_dashboard(request):
     teacher = get_object_or_404(Faculty, pk=request.user.pk)
-    courses = Course.objects.filter(faculty=teacher)
+    # This query is now optimized to prevent extra database hits
+    courses = Course.objects.filter(faculty=teacher).select_related('dept', 'faculty')
     context = {
         'teacher': teacher,
         'courses': courses,
@@ -123,10 +126,14 @@ def course_detail_view(request, course_id):
             'is_present_today': student.user.id in present_student_ids
         })
 
-    attendance_summary = Attendance.objects.filter(course=course) \
-        .values('date') \
-        .annotate(present_count=Count('pk', filter=Q(status=True))) \
-        .order_by('-date')
+    cache_key = f'course_{course_id}_attendance_summary'
+    attendance_summary = cache.get(cache_key)
+    if not attendance_summary:
+        attendance_summary = Attendance.objects.filter(course=course) \
+            .values('date') \
+            .annotate(present_count=Count('pk', filter=Q(status=True))) \
+            .order_by('-date')
+        cache.set(cache_key, attendance_summary, 900)
 
     context = {
         'course': course,
@@ -146,16 +153,16 @@ def add_assignment_view(request, course_id):
         if form.is_valid():
             assessment = form.save(commit=False)
             assessment.course = course
+            assessment.type = 'assignment'
             assessment.save()
             return redirect('course_detail', course_id=course.course_id)
     else:
         form = AssignmentForm()
-
     return render(request, 'add_assignment.html', {'form': form, 'course': course})
 
 @login_required
 def assessment_detail_view(request, assessment_id):
-    assessment = get_object_or_404(Assessment, assessment_id=assessment_id)
+    assessment = get_object_or_404(Assessment.objects.select_related('course'), assessment_id=assessment_id)
     students = assessment.course.enrolled_students.all()
 
     if request.method == 'POST':

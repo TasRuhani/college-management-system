@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 {% load static %}
-{% load pwa %}
-<html lang="en" class="dark">
+{% load pwa %} <html lang="en" class="dark">
 
 <head>
-    <meta charset="UTF-8">
+    {% progressive_web_app_meta %} <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,13 +54,11 @@
     <nav class="bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-row items-center justify-between h-16 gap-3">
-                <!-- Left Side: Logo & Title -->
                 <div class="flex items-center space-x-3 flex-shrink-0">
                     <img src="{% static 'assets/logo.png' %}" alt="Logo" class="h-8 w-8 object-contain">
                     <a href="/" class="text-sm sm:text-lg font-bold text-white whitespace-nowrap">EduNexus</a>
                 </div>
 
-                <!-- Right Side: Full Name & Logout -->
                 <div class="flex items-center space-x-3 justify-end whitespace-nowrap flex-shrink-0">
                     {% if user.is_authenticated %}
                     <span class="text-white font-semibold mr-1 whitespace-nowrap text-xs sm:text-lg">
