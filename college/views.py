@@ -93,7 +93,17 @@ def teacher_dashboard(request):
 @login_required
 def course_detail_view(request, course_id):
     course = get_object_or_404(Course, course_id=course_id)
-    students_in_course = course.enrolled_students.all()
+    
+    # --- START OF CACHING LOGIC ---
+    student_list_cache_key = f'course_{course_id}_student_list'
+    students_in_course = cache.get(student_list_cache_key)
+
+    if not students_in_course:
+        students_in_course = course.enrolled_students.all()
+        # Set cache for 1 hour (3600 seconds)
+        cache.set(student_list_cache_key, students_in_course, 3600)
+    # --- END OF CACHING LOGIC ---
+
     assessments = Assessment.objects.filter(course=course)
     
     if request.method == 'POST':
