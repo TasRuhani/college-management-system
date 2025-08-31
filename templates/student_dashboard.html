@@ -14,13 +14,14 @@
             <li class="p-3 bg-gray-700/50 rounded-md text-gray-300 grid grid-cols-3 gap-4 items-center">
                 <span>{{ data.course.course_name }}</span>
                 <span class="px-2 text-xs sm:text-lg">{{ data.course.course_code }}</span>
-                <span class="font-semibold mx-auto px-4 py-1 rounded-full text-sm text-center
-                    {% if data.percentage > 50 %}
-                        bg-green-500/20 text-green-300
-                    {% else %}
-                        bg-red-500/20 text-red-300
-                    {% endif %}">
-                    {{ data.percentage|floatformat:2 }}%
+                <span class="font-semibold mx-auto px-4 py-1 rounded-full text-sm text-center 
+                        inline-block w-20 
+                        {% if data.percentage > 50 %}
+                            bg-green-500/20 text-green-300
+                        {% else %}
+                            bg-red-500/20 text-red-300
+                            {% endif %}">
+                        {{ data.percentage|floatformat:2 }}%
                 </span>
             </li>
             {% empty %}

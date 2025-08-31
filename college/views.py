@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F, FloatField, Case, When
 from django.core.cache import cache
 from .models import Student, Faculty, Course, Assessment, Attendance, Result
 from .forms import LoginForm, AssignmentForm
@@ -59,24 +59,28 @@ def student_dashboard(request):
     )
     
     courses = student.enrolled_courses.all()
+
+    attendance_data = []
+    for course in courses:
+        attendance_data.append({
+            'course': course,
+            'percentage': student.get_attendance_percentage(course)
+        })
+
     assessments_with_results = []
-    all_assessments = Assessment.objects.filter(course__in=courses).order_by('course')
+    all_assessments = Assessment.objects.filter(course__in=courses).prefetch_related('result_set').order_by('course')
+    
     for assessment in all_assessments:
-        result = Result.objects.filter(student=student, assessment=assessment).first()
+        result = next((r for r in assessment.result_set.all() if r.student_id == student.user_id), None)
         assessments_with_results.append({
             'assessment': assessment,
             'result': result
         })
-    
-    course_data = []
-    for course in courses:
-        percentage = student.get_attendance_percentage(course)
-        course_data.append({'course': course, 'percentage': percentage})
 
     context = {
         'student': student,
-        'course_data': course_data,
         'assessments_with_results': assessments_with_results,
+        'attendance_data': attendance_data, 
     }
     return render(request, 'student_dashboard.html', context)
 
@@ -94,15 +98,12 @@ def teacher_dashboard(request):
 def course_detail_view(request, course_id):
     course = get_object_or_404(Course, course_id=course_id)
     
-    # --- START OF CACHING LOGIC ---
     student_list_cache_key = f'course_{course_id}_student_list'
     students_in_course = cache.get(student_list_cache_key)
 
     if not students_in_course:
         students_in_course = course.enrolled_students.all()
-        # Set cache for 1 hour (3600 seconds)
-        cache.set(student_list_cache_key, students_in_course, 3600)
-    # --- END OF CACHING LOGIC ---
+        cache.set(student_list_cache_key, students_in_course, 3600) #1hr
 
     assessments = Assessment.objects.filter(course=course)
     
@@ -123,16 +124,27 @@ def course_detail_view(request, course_id):
     view_date_str = request.GET.get('date', timezone.now().strftime("%Y-%m-%d"))
     view_date = timezone.datetime.strptime(view_date_str, "%Y-%m-%d").date()
 
-    present_student_ids = Attendance.objects.filter(
+    present_student_ids = set(Attendance.objects.filter(
         course=course, date=view_date, status=True
-    ).values_list('student__user__id', flat=True)
+    ).values_list('student_id', flat=True))
+
+    students_with_attendance = students_in_course.annotate(
+        total_classes=Count('attendance', filter=Q(attendance__course=course)),
+        present_classes=Count('attendance', filter=Q(attendance__course=course, attendance__status=True))
+    ).annotate(
+        attendance_percentage=Case(
+            When(total_classes=0, then=0.0),
+            default=(F('present_classes') * 100.0 / F('total_classes')),
+            output_field=FloatField()
+        )
+    )
 
     student_data = []
-    for student in students_in_course:
+    for student in students_with_attendance:
         student_data.append({
             'student': student,
-            'attendance_percentage': student.get_attendance_percentage(course),
-            'is_present_today': student.user.id in present_student_ids
+            'attendance_percentage': student.attendance_percentage, 
+            'is_present_today': student.pk in present_student_ids
         })
     
     cache_key = f'course_{course_id}_attendance_summary'
@@ -147,7 +159,6 @@ def course_detail_view(request, course_id):
     context = {
         'course': course,
         'student_data': student_data,
-        'students': students_in_course,
         'assessments': assessments,
         'view_date': view_date,
         'attendance_summary': attendance_summary,
@@ -162,7 +173,6 @@ def add_assignment_view(request, course_id):
         if form.is_valid():
             assessment = form.save(commit=False)
             assessment.course = course
-            assessment.type = 'assignment'
             assessment.save()
             return redirect('course_detail', course_id=course.course_id)
     else:
@@ -185,12 +195,14 @@ def assessment_detail_view(request, assessment_id):
                 )
         return redirect('assessment_detail', assessment_id=assessment.assessment_id)
 
+    results = Result.objects.filter(assessment=assessment, student__in=students)
+    results_map = {result.student_id: result.marks for result in results}
+
     student_results = []
     for student in students:
-        result = Result.objects.filter(student=student, assessment=assessment).first()
         student_results.append({
             'student': student,
-            'marks': result.marks if result else None
+            'marks': results_map.get(student.user_id) 
         })
 
     context = {
