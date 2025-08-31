@@ -102,7 +102,7 @@ def course_detail_view(request, course_id):
     students_in_course = cache.get(student_list_cache_key)
 
     if not students_in_course:
-        students_in_course = course.enrolled_students.all()
+        students_in_course = course.enrolled_students.all().order_by('roll_no')
         cache.set(student_list_cache_key, students_in_course, 3600) #1hr
 
     assessments = Assessment.objects.filter(course=course)
