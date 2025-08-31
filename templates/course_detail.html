@@ -126,9 +126,9 @@
                 <a href="?date={{ record.date|date:'Y-m-d' }}"
                     class="block p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
                     <div class="flex flex-row justify-between items-center gap-2">
-                        <span class="font-medium text-indigo-400">{{ record.date|date:"F d, Y" }}</span>
+                        <span class="font-medium text-grey-300">{{ record.date|date:"F d, Y" }}</span>
                         <span class="text-sm font-semibold px-2 py-1 rounded-full 
-                            {% if record.present_count == students|length %}
+                            {% if record.present_count == student_data|length %}
                                 bg-green-500/20 text-green-300
                             {% else %}
                                 bg-yellow-500/20 text-yellow-300
